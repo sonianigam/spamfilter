@@ -1,5 +1,5 @@
 #Starter code for spam filter assignment in EECS349 Machine Learning
-#Author: Prem Seetharaman (replace your name here)
+#Author: Sonia Nigam
 
 import sys
 import numpy as np
@@ -69,23 +69,24 @@ def makedictionary(spam_directory, ham_directory, dictionary_filename):
 
 def is_spam(content, dictionary, spam_prior_probability):
 	#TODO: Update this function. Right now, all it does is checks whether the spam_prior_probability is more than half the data. If it is, it says spam for everything. Else, it says ham for everything. You need to update it to make it use the dictionary and the content of the mail. Here is where your naive Bayes classifier goes.
+    
     spam_probability = math.log(spam_prior_probability)
     ham_probability = math.log(1-spam_prior_probability)
 
+
     for word in content:
-        if word in dictionary:
-            # print dictionary[word]['spam']
-            # print dictionary[word]['ham']
-            # print word
-            
+        if word in dictionary: 
             spam_probability += math.log(dictionary[word]['spam'])
             ham_probability += math.log(dictionary[word]['ham'])
         else:
             pass
 
-	if spam_probability >= ham_probability:
+    print spam_probability
+    print ham_probability
+
+    if spam_probability >= ham_probability:
 		return True
-	else:
+    else:
 		return False
 
 def spamsort(mail_directory, spam_directory, ham_directory, dictionary, spam_prior_probability):
