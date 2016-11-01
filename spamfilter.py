@@ -50,6 +50,17 @@ def makedictionary(spam_directory, ham_directory, dictionary_filename):
                 else:
                     ham_tracker.append(word)
                     words[word]['ham'] += 1
+    
+    for word in words:
+        if words[word]['spam'] != 0:
+            words[word]['spam'] = float(words[word]['spam'])/float(len(spam))
+        else:
+            words[word]['spam'] = 1.0/(float(len(spam)) + 1.0)
+            
+        if words[word]['ham'] != 0:
+            words[word]['ham'] = float(words[word]['ham'])/float(len(ham))
+        else:
+            words[word]['ham'] = 1.0/(float(len(ham)) + 1.0)
 	
 	#Write it to a dictionary output file.
 	writedictionary(words, dictionary_filename)
