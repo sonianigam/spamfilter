@@ -32,13 +32,24 @@ def makedictionary(spam_directory, ham_directory, dictionary_filename):
 
 	#These for loops walk through the files and construct the dictionary. The dictionary, words, is constructed so that words[word]['spam'] gives the probability of observing that word, given we have a spam document P(word|spam), and words[word]['ham'] gives the probability of observing that word, given a hamd document P(word|ham). Right now, all it does is initialize both probabilities to 0. TODO: add code that puts in your estimates for P(word|spam) and P(word|ham).
 	for s in spam:
+        spam_tracker = []
 		for word in parse(open(spam_directory + s)):
 			if word not in words:
-				words[word] = {'spam': 0, 'ham': 0}
+                if word not in spam_tracker:
+				    words[word] = {'spam': 1, 'ham': 0}
+                else:
+                    spam_tracker.append(word)
+                    words[word]['spam'] += 1
+                
 	for h in ham:
+        ham_tracker = []
 		for word in parse(open(ham_directory + h)):
 			if word not in words:
-				words[word] = {'spam': 0, 'ham': 0}
+                if word not in ham_tracker:
+				    words[word] = {'spam': 0, 'ham': 1}
+                else:
+                    ham_tracker.append(word)
+                    words[word]['ham'] += 1
 	
 	#Write it to a dictionary output file.
 	writedictionary(words, dictionary_filename)
