@@ -31,34 +31,47 @@ def makedictionary(spam_directory, ham_directory, dictionary_filename):
 	words = {}
 
 	#These for loops walk through the files and construct the dictionary. The dictionary, words, is constructed so that words[word]['spam'] gives the probability of observing that word, given we have a spam document P(word|spam), and words[word]['ham'] gives the probability of observing that word, given a hamd document P(word|ham). Right now, all it does is initialize both probabilities to 0. TODO: add code that puts in your estimates for P(word|spam) and P(word|ham).
+    
+    #iterate through each file in spam and track frequency of spam words 
 	for s in spam:
         spam_tracker = []
 		for word in parse(open(spam_directory + s)):
+            #new entry in the dict
 			if word not in words:
                 if word not in spam_tracker:
 				    words[word] = {'spam': 1, 'ham': 0}
+                #increment frequency in dict
                 else:
                     spam_tracker.append(word)
                     words[word]['spam'] += 1
-                
+      
+    #iterate through each file in ham and track frequency of ham words          
 	for h in ham:
         ham_tracker = []
 		for word in parse(open(ham_directory + h)):
+            #new entry in dict
 			if word not in words:
                 if word not in ham_tracker:
 				    words[word] = {'spam': 0, 'ham': 1}
+                #increment frequency in dict
                 else:
                     ham_tracker.append(word)
                     words[word]['ham'] += 1
-    
+                    
+    #itrate through all words in dict
     for word in words:
+        #find prior spam probability
         if words[word]['spam'] != 0:
             words[word]['spam'] = float(words[word]['spam'])/float(len(spam))
+        #handle 0 case
         else:
             words[word]['spam'] = 1.0/(float(len(spam)) + 1.0)
             
+        #find prior ham probability 
         if words[word]['ham'] != 0:
             words[word]['ham'] = float(words[word]['ham'])/float(len(ham))
+            
+        #handle 0 case
         else:
             words[word]['ham'] = 1.0/(float(len(ham)) + 1.0)
 	
