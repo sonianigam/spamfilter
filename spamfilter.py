@@ -1,9 +1,10 @@
 #Starter code for spam filter assignment in EECS349 Machine Learning
-#Author: Sonia Nigam (replace your name here)
+#Author: Prem Seetharaman (replace your name here)
 
 import sys
 import numpy as np
 import os
+import math
 import shutil
 
 def parse(text_file):
@@ -31,50 +32,36 @@ def makedictionary(spam_directory, ham_directory, dictionary_filename):
 	words = {}
 
 	#These for loops walk through the files and construct the dictionary. The dictionary, words, is constructed so that words[word]['spam'] gives the probability of observing that word, given we have a spam document P(word|spam), and words[word]['ham'] gives the probability of observing that word, given a hamd document P(word|ham). Right now, all it does is initialize both probabilities to 0. TODO: add code that puts in your estimates for P(word|spam) and P(word|ham).
-    
     #iterate through each file in spam and track frequency of spam words 
 	for s in spam:
-        spam_tracker = []
+		spam_tracker = []
 		for word in parse(open(spam_directory + s)):
             #new entry in the dict
 			if word not in words:
-                if word not in spam_tracker:
-				    words[word] = {'spam': 1, 'ham': 0}
+				words[word] = {'spam': 1, 'ham': 0}
                 #increment frequency in dict
-                else:
-                    spam_tracker.append(word)
-                    words[word]['spam'] += 1
+			elif word not in spam_tracker:
+				spam_tracker.append(word)
+				words[word]['spam'] += 1
       
     #iterate through each file in ham and track frequency of ham words          
 	for h in ham:
-        ham_tracker = []
+		ham_tracker = []
 		for word in parse(open(ham_directory + h)):
             #new entry in dict
 			if word not in words:
-                if word not in ham_tracker:
-				    words[word] = {'spam': 0, 'ham': 1}
+				words[word] = {'spam': 0, 'ham': 1}
                 #increment frequency in dict
-                else:
-                    ham_tracker.append(word)
-                    words[word]['ham'] += 1
-                    
-    #itrate through all words in dict
-    for word in words:
-        #find prior spam probability
-        if words[word]['spam'] != 0:
-            words[word]['spam'] = float(words[word]['spam'])/float(len(spam))
-        #handle 0 case
-        else:
-            words[word]['spam'] = 1.0/(float(len(spam)) + 1.0)
-            
-        #find prior ham probability 
-        if words[word]['ham'] != 0:
-            words[word]['ham'] = float(words[word]['ham'])/float(len(ham))
-            
-        #handle 0 case
-        else:
-            words[word]['ham'] = 1.0/(float(len(ham)) + 1.0)
-	
+			elif word not in ham_tracker:
+				ham_tracker.append(word)
+				words[word]['ham'] += 1
+
+
+	for word in words:
+		words[word]['spam'] = float(words[word]['spam']+1)/(float(len(spam))+1)
+		words[word]['ham'] = float(words[word]['ham']+1)/(float(len(ham))+1)
+
+    
 	#Write it to a dictionary output file.
 	writedictionary(words, dictionary_filename)
 	
@@ -82,7 +69,21 @@ def makedictionary(spam_directory, ham_directory, dictionary_filename):
 
 def is_spam(content, dictionary, spam_prior_probability):
 	#TODO: Update this function. Right now, all it does is checks whether the spam_prior_probability is more than half the data. If it is, it says spam for everything. Else, it says ham for everything. You need to update it to make it use the dictionary and the content of the mail. Here is where your naive Bayes classifier goes.
-	if spam_prior_probability >= .5:
+    spam_probability = math.log(spam_prior_probability)
+    ham_probability = math.log(1-spam_prior_probability)
+
+    for word in content:
+        if word in dictionary:
+            # print dictionary[word]['spam']
+            # print dictionary[word]['ham']
+            # print word
+            
+            spam_probability += math.log(dictionary[word]['spam'])
+            ham_probability += math.log(dictionary[word]['ham'])
+        else:
+            pass
+
+	if spam_probability >= ham_probability:
 		return True
 	else:
 		return False
